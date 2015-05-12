@@ -10,14 +10,19 @@
 
 (defn new-system [configuration]
   (-> (component/system-map
+       ;; Configuration
        :configuration configuration
+       ;; Framework layer
        :database (database/new-database)
+       :web (web/new-web-server)
+       ;; Interface layer
        :data-access (data-access/new-data-access)
-       :ratings (ratings/new-ratings)
-       :bwertr (bwertr/new-bwertr-application)
        :controller (controller/new-bwertr-controller)
        :view (view/new-bwertr-view)
-       :web (web/new-web-server))
+       ;; Application domain layer
+       :bwertr (bwertr/new-bwertr-application)
+       ;; Enterprise domain layer
+       :ratings (ratings/new-ratings))
       (component/system-using
        {:database [:configuration]
         :data-access [:database]
