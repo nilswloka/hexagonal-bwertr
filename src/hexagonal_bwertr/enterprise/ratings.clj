@@ -1,6 +1,15 @@
-(ns hexagonal-bwertr.enterprise.ratings)
+(ns hexagonal-bwertr.enterprise.ratings
+  (:require [schema.core :as s]
+            [hexagonal-bwertr.enterprise.schemas :as schemas]))
 
-(defrecord Rating [value])
+(s/defschema RatingValue (schemas/lower-upper-bound-number 1 10))
+(s/defrecord Rating [value :- RatingValue])
+
+(def validate-rating (partial s/validate Rating))
+
+(defn create-rating [value]
+  (doto (->Rating value)
+    (validate-rating)))
 
 (defprotocol RatingsRepository
   (store! [this ^Rating rating])

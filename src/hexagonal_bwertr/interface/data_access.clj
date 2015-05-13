@@ -14,7 +14,10 @@
 
 (defn- retrieve-all-ratings [db-spec]
   (jdbc/with-db-transaction [connection db-spec]
-    (map ratings/map->Rating (retrieve-all-query connection))))
+    (into []
+          (comp ratings/map->Rating
+                ratings/validate-rating)
+          (retrieve-all-query connection))))
 
 (defrecord DataAccessComponent [database]
   ratings/RatingsRepository
@@ -25,8 +28,6 @@
 
 (defn new-data-access []
   (map->DataAccessComponent {}))
-
-
 
 
 

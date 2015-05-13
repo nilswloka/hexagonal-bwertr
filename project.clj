@@ -2,9 +2,14 @@
   :description "A sample project demonstrating hexagonal architecture with Clojure"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta2"]
+                 [prismatic/schema "0.4.2"]
                  ;; Database
                  [yesql "0.4.0"]
+                 ;; needed to override yesql's
+                 ;; dependency on an older Instaparse version
+                 ;; that doesn't work with Clojure 1.7.0-beta2
+                 [instaparse "1.4.0"]
                  [org.clojure/java.jdbc "0.3.6"]
                  [com.mchange/c3p0 "0.9.5"]
                  [org.postgresql/postgresql "9.3-1103-jdbc4"]

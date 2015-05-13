@@ -5,7 +5,18 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace]]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [ring.adapter.jetty :refer [run-jetty]]
+            [hexagonal-bwertr.enterprise.schemas :as schemas])
+  (:import (clojure.lang ExceptionInfo)))
+
+(defn wrap-validation-errors [handler]
+  (fn [req]
+    (try
+      (handler req)
+      (catch ExceptionInfo exi
+        (if (schemas/validation-error? (ex-data exi))
+          {:status 400 :body (pr-str (:error (ex-data exi)))}
+          (throw exi))))))
 
 (defn- make-bwertr-routes [controller]
   (-> (routes
@@ -13,6 +24,7 @@
        (POST "/" [rating] (controller/rate-with-controller controller rating))
        (GET "/stats" [] (controller/statistics-controller controller)))
       (wrap-defaults site-defaults)
+      wrap-validation-errors
       wrap-stacktrace))
 
 (defrecord WebServer [controller configuration]
