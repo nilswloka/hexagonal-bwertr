@@ -12,7 +12,7 @@
 
 (defn- rate-with-controller* [bwertr view own-rating]
   (let [rating-number (Integer/valueOf own-rating)]
-    (bwertr/rate-with! bwertr (ratings/->Rating rating-number))
+    (bwertr/rate-with! bwertr (ratings/create-rating rating-number))
     (view/result-view view (assoc (bwertr/statistics bwertr) :own-rating rating-number))))
 
 (defprotocol BwertrController

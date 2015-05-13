@@ -9,7 +9,8 @@
             [clojure.set :as set]
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
-            [hexagonal-bwertr.system :refer [new-system]]))
+            [hexagonal-bwertr.system :refer [new-system]]
+            [hexagonal-bwertr.interface.data-access :as data-access]))
 
 (def dev-config {:db {:server {:host "localhost"
                                :port 5432
@@ -19,4 +20,11 @@
                              :expire (* 3 60 60)}}
                  :http {:port 3000}})
 
-(reloaded.repl/set-init! #(new-system dev-config))
+(def dev-system (new-system dev-config))
+
+(def dev-system-in-memory-db
+  (-> dev-system
+      (assoc :data-access (data-access/new-in-memory-ratings-repository))))
+
+(reloaded.repl/set-init! (fn []
+                           dev-system-in-memory-db))
