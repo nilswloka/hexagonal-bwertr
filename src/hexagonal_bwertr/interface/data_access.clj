@@ -29,16 +29,6 @@
 (defn new-data-access []
   (map->DataAccessComponent {}))
 
-(defrecord InMemoryAccessComponent [store]
-  ratings/RatingsRepository
-  (store! [this rating]
-    (swap! store conj rating))
-  (retrieve-all [this]
-    @store))
-
-(defn new-in-memory-ratings-repository []
-  (map->InMemoryAccessComponent {:store (atom [])}))
-
 
 
 

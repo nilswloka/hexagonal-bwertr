@@ -10,7 +10,8 @@
             [clojure.test :as test]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [hexagonal-bwertr.system :refer [new-system]]
-            [hexagonal-bwertr.interface.data-access :as data-access]))
+            [hexagonal-bwertr.interface.data-access :as data-access]
+            [hexagonal-bwertr.enterprise.ratings :as ratings]))
 
 (def dev-config {:db {:server {:host "localhost"
                                :port 5432
@@ -22,9 +23,19 @@
 
 (def dev-system (new-system dev-config))
 
+(defrecord InMemoryAccessComponent [store]
+  ratings/RatingsRepository
+  (store! [this rating]
+    (swap! store conj rating))
+  (retrieve-all [this]
+    @store))
+
+(defn new-in-memory-ratings-repository []
+  (map->InMemoryAccessComponent {:store (atom [])}))
+
 (def dev-system-in-memory-db
   (-> dev-system
-      (assoc :data-access (data-access/new-in-memory-ratings-repository))))
+      (assoc :data-access (new-in-memory-ratings-repository))))
 
 (reloaded.repl/set-init! (fn []
-                           dev-system-in-memory-db))
+                           dev-system))
